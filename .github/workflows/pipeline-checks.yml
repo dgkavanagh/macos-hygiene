@@ -1,0 +1,27 @@
+name: Pipeline checks
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  secrets-in-code:
+    name: Secret detection
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: trufflesecurity/trufflehog@v3
+        with:
+          extra_args: --only-verified --no-update
+
+  dependencies:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm audit --audit-level=high || true
